@@ -18,8 +18,8 @@ dv = dx*dy*dz
 
 eps = 8.85e-12
 mu = 1.256e-6
-steps = 1000
-dt = 1
+steps = 10
+dt = 1e-17
 
 #make sure locs isnt in the nx,ny,nz cubes so derivatives work nice
 particle1 = Particle(9.1e-31,np.array([25*dx-5.29e-11,25*dy,25*dz]),np.array([0,0,0]),-1.602e-19)
@@ -40,6 +40,10 @@ for i in particles:
     z = int(np.floor(i.position[2]/dz))
     if x+1<nx:
         E[x+1, y, z, 0] = (i.charge/dv)*(dx/eps)
+        E[x + 1, y, z, 0] = 0
+        print("___")
+        print(E[x+1, y, z, 0])
+        print("___")
     if x+1>=nx:
         #leaving it here for later
         E[x, y, z,0] = 0
@@ -51,6 +55,7 @@ correcE = []
 sizecorB = 0
 sizecorE = 0
 for l in range(1,steps):
+    print(l)
     for x in range(nx):
         for y in range(ny):
             for z in range(nz):
@@ -67,6 +72,8 @@ for l in range(1,steps):
                     derBZ = (B[x, y, z + 1] - B[x, y, z]) / dz
 
                 if derEX.any() or derEY.any() or derEZ.any():
+                    print("derEX,derEY,derEZ")
+                    print(derEX,derEY,derEZ)
                     correcB.append([[x,y,z],[derEZ[1]-derEY[2],derEX[2]-derEZ[0],derEY[0]-derEX[1]]])
                     sizecorB = sizecorB + 1
                     j = [0,0,0]
@@ -90,7 +97,6 @@ for l in range(1,steps):
     for i in range(sizecorB):
         x,y,z = correcB[i][0][0],correcB[i][0][1],correcB[i][0][2]
         arr = np.array([correcB[i][1][0],correcB[i][1][1],correcB[i][1][2]])
-        print(B[x,y,z])
         B[x,y,z] = B[x,y,z] + arr*dt
     #DONE WITH UPDATING FIELDS, NOW NEED TO CALCULATE FORCE ACTING ON EACH PARTICLE, I.E RETRIEVE THE FIELD AT THE LOC OF THE PARTILCE. MAYBE BORIS ALGO?
 
