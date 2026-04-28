@@ -111,5 +111,5 @@ for l in range(1,steps):
                         tempV = [(derBY[2]-derBZ[1])/(mu*eps)-j[0]/eps,(derBZ[0]-derBX[2])/(mu*eps)-j[1]/eps,(derBX[1]-derBY[0])/(mu*eps)-j[2]/eps]
                         correcE.append([[x,y,z],tempV])
     #i have found all the corrections needed to be done to the fields. now we need to use them to update our fields
-
+    #NEED LENGTH OF CORRECTION MATRICES, GO THROGUH THEM CHANGE ELEMENT ELEMENT, DONT TRY TO BE SMART AND EFFICIENT, YOU AINT TURIN
 
