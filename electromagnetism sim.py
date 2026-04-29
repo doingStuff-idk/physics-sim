@@ -35,18 +35,16 @@ B = np.zeros((nx, ny, nz, 3))
 #EVERY TIME NI+1 IS USED FPOR THE DERIVATIVE EQUATE IT TO 0
 #ensuring guassian starter conditions so the gauss equations hold true for later
 for i in particles:
-    x = int(np.floor(i.position[0]/dx))
-    y = int(np.floor(i.position[1]/dy))
-    z = int(np.floor(i.position[2]/dz))
-    if x+1<nx:
-        E[x+1, y, z, 0] = (i.charge/dv)*(dx/eps)
-        E[x + 1, y, z, 0] = 0
-        print("___")
-        print(E[x+1, y, z, 0])
-        print("___")
-    if x+1>=nx:
-        #leaving it here for later
-        E[x, y, z,0] = 0
+    sx = int(np.floor(i.position[0]/dx))
+    sy = int(np.floor(i.position[1]/dy))
+    sz = int(np.floor(i.position[2]/dz))
+    for x in range(nx):
+        for y in range(ny):
+            for z in range(nz):
+                if x!=sx or y!=sy or z!=sz:
+                    bluh =((x-sx)**2+(y-sy)**2+(z-sz)**2)
+                    factor = 1/(np.sqrt(((x-sx)**2+(y-sy)**2+(z-sz)**2)))**3
+                    E[x,y,z] = E[x,y,z]+np.array([x-sx,y-sy,z-sz])*factor
 #order of steps
 #calculate fields
 #apply forces and update locs and vels
@@ -72,8 +70,6 @@ for l in range(1,steps):
                     derBZ = (B[x, y, z + 1] - B[x, y, z]) / dz
 
                 if derEX.any() or derEY.any() or derEZ.any():
-                    print("derEX,derEY,derEZ")
-                    print(derEX,derEY,derEZ)
                     correcB.append([[x,y,z],[derEZ[1]-derEY[2],derEX[2]-derEZ[0],derEY[0]-derEX[1]]])
                     sizecorB = sizecorB + 1
                     j = [0,0,0]
@@ -97,6 +93,7 @@ for l in range(1,steps):
     for i in range(sizecorB):
         x,y,z = correcB[i][0][0],correcB[i][0][1],correcB[i][0][2]
         arr = np.array([correcB[i][1][0],correcB[i][1][1],correcB[i][1][2]])
+        print(arr)
         B[x,y,z] = B[x,y,z] + arr*dt
     #DONE WITH UPDATING FIELDS, NOW NEED TO CALCULATE FORCE ACTING ON EACH PARTICLE, I.E RETRIEVE THE FIELD AT THE LOC OF THE PARTILCE. MAYBE BORIS ALGO?
 
