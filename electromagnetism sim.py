@@ -93,7 +93,29 @@ for l in range(1,steps):
     for i in range(sizecorB):
         x,y,z = correcB[i][0][0],correcB[i][0][1],correcB[i][0][2]
         arr = np.array([correcB[i][1][0],correcB[i][1][1],correcB[i][1][2]])
-        print(arr)
         B[x,y,z] = B[x,y,z] + arr*dt
     #DONE WITH UPDATING FIELDS, NOW NEED TO CALCULATE FORCE ACTING ON EACH PARTICLE, I.E RETRIEVE THE FIELD AT THE LOC OF THE PARTILCE. MAYBE BORIS ALGO?
-
+    #HERE WE GO
+    for i in particles:
+        x = int(np.floor(i.position[0] / dx))
+        y = int(np.floor(i.position[1] / dy))
+        z = int(np.floor(i.position[2] / dz))
+        VxB = [i.velocity[1]*B[x,y,z,2]-i.velocity[2]*B[x,y,z,1],i.velocity[2]*B[x,y,z,0]-i.velocity[0]*B[x,y,z,2],i.velocity[0]*B[x,y,z,1]-i.velocity[1]*B[x,y,z,0]]
+        acc=(E[x,y,z]+VxB)*i.charge/i.mass
+        i.position = i.position + i.velocity * dt
+        i.velocity = i.velocity + acc * dt
+        if (i.position[0]>= (nx-1) * dx):
+            i.position[0] = 10*dx
+            #punishment
+            i.velocity[0] = 0
+        if (i.position[1] >= (ny-1) * dy):
+            i.position[1] = 10*dy
+            i.velocity[1] = 0
+        if (i.position[2] >= (nz-1) * dz):
+            i.position[2] = 10*dz
+            i.velocity[2] = 0
+        #this position updating part using lorentz seems to work, now only locs updating needed, fk me never mind need to make sure particle is inside the boundries
+        #THIS IS USELESS START LOOKING AT ENERGY, PROBABLY NOT CONSERVED
+        #oh, it worked, my bad code compiled, huh]
+    locs[0][l] = particles[0].position
+    locs[1][l] = particles[1].position
